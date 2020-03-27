@@ -3,14 +3,17 @@ version: '3.2'
 services:
   elasticsearch:
     container_name: es
-    image: elasticsearch:$ELK_VERSION
+    build:
+      context: elasticsearch/
+      args:
+        ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
         source: ./elasticsearch/config/elasticsearch.yml
         target: /usr/share/elasticsearch/config/elasticsearch.yml
         read_only: true
       - type: volume
-        source: es
+        source: elasticsearch
         target: /usr/share/elasticsearch/data
     ports:
       - "9200:9200"
@@ -25,8 +28,11 @@ services:
       - elk
 
   logstash:
-    image: logstash:$ELK_VERSION
     container_name: logstash
+    build:
+      context: logstash/
+      args:
+        ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
         source: ./logstash/config/logstash.yml
@@ -49,7 +55,10 @@ services:
 
   kibana:
     container_name: kibana
-    image: kibana:$ELK_VERSION
+    build:
+      context: kibana/
+      args:
+        ELK_VERSION: $ELK_VERSION
     volumes:
       - type: bind
         source: ./kibana/config/kibana.yml
@@ -67,4 +76,4 @@ networks:
     driver: bridge
 
 volumes:
-  es: /home/es
+  elasticsearch:
